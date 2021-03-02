@@ -6,7 +6,7 @@ use std::{
 
 use flate2::read::GzDecoder;
 use rayon::iter::{IntoParallelIterator, ParallelBridge, ParallelIterator};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 pub struct Fdns {
     file: String,
@@ -20,13 +20,13 @@ pub struct Options {
     allow_list: Vec<String>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[derive(Default, Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Entry {
     pub timestamp: String,
     pub name: String,
     #[serde(rename = "type")]
-    pub entry_kind: String,
+    pub kind: String,
     pub value: String,
 }
 
@@ -59,7 +59,7 @@ impl Fdns {
             .par_bridge()
             .filter_map(|line| serde_json::from_str(&line.expect("msg")).ok())
             .filter(|e: &Entry| {
-                if e.entry_kind != self.options.kind {
+                if e.kind != self.options.kind {
                     return false;
                 }
 

@@ -2,6 +2,7 @@ use std::fs;
 
 use clap::{App, Arg};
 use fdns::Options;
+use prettytable::{Cell, Row, Table};
 use regex::Regex;
 
 mod fdns;
@@ -10,6 +11,15 @@ fn main() {
         .version("1.0")
         .author("freddd")
         .about("filter rapid7 fdns files")
+        .arg(
+            Arg::with_name("output")
+                .short("o")
+                .long("output")
+                .takes_value(true)
+                .help("table or json output")
+                .default_value("table")
+                .env("FDNS_OUTPUT"),
+        )
         .arg(
             Arg::with_name("path")
                 .short("p")
@@ -34,7 +44,7 @@ fn main() {
                 .long("kind")
                 .takes_value(true)
                 .required(true)
-                .help("which kind to look for A, AAAA, NS or CNAME")
+                .help("which kind to look for A, AAAA, TXT, MX or CNAME")
                 .env("FDNS_KIND"),
         )
         .arg(
@@ -66,7 +76,7 @@ fn main() {
         }
     };
 
-    let x = fdns::Fdns::new(
+    let result = fdns::Fdns::new(
         fdns_file.to_string(),
         Options::new(
             matches.is_present("value"),
@@ -77,7 +87,35 @@ fn main() {
     )
     .read();
 
-    println!("{:#?}", x)
+    match result {
+        Ok(entries) => match matches.value_of("output").unwrap() {
+            "json" => println!("{:#?}", serde_json::to_string(&entries).unwrap()),
+            "table" => {
+                let mut table = Table::new();
+                table.add_row(Row::new(vec![
+                    Cell::new("NAME"),
+                    Cell::new("VALUE"),
+                    Cell::new("TYPE"),
+                    Cell::new("TIMESTAMP"),
+                ]));
+
+                for entry in entries {
+                    table.add_row(Row::new(vec![
+                        Cell::new(&entry.name),
+                        Cell::new(&entry.value),
+                        Cell::new(&entry.kind),
+                        Cell::new(&entry.timestamp),
+                    ]));
+                }
+
+                table.printstd();
+            }
+            _ => unreachable!(),
+        },
+        Err(e) => {
+            println!("{:#?}", e)
+        }
+    }
 }
 
 fn read_csv(path: &str) -> Vec<std::string::String> {
