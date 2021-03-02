@@ -1,0 +1,20 @@
+[package]
+name = "fdns-filter"
+version = "0.1.0"
+authors = ["freddd"]
+edition = "2018"
+
+[dependencies]
+serde = { version = "1.0.119", features = ["derive"] }
+serde_json = "1.0.61"
+flate2 = "1.0.20"
+rayon = "1.5.0"
+regex = "1"
+clap = "2.33.3"
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "fdns-filter"
+path = "src/main.rs"
