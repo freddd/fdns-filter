@@ -16,6 +16,7 @@ FLAGS:
 OPTIONS:
     -a, --allow-list <allow-list>    path to txt containing allowed domains [env: FDNS_ALLOW_LIST=]
     -k, --kind <kind>                which kind to look for A, AAAA, TXT, MX or CNAME [env: FDNS_KIND=]
+    -o, --output <output>            table or json output [env: FDNS_OUTPUT=]  [default: table]
     -p, --path <path>                path to fdns gzip file [env: FDNS_PATH=]
     -r, --regex <regex>              regex pattern to use as filter [env: FDNS_REGEX=]
 ```
