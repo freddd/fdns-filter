@@ -1,3 +1,4 @@
+use crate::fdns::Entry;
 use std::fs;
 
 use clap::{App, Arg};
@@ -91,24 +92,7 @@ fn main() {
         Ok(entries) => match matches.value_of("output").unwrap() {
             "json" => println!("{:#?}", serde_json::to_string(&entries).unwrap()),
             "table" => {
-                let mut table = Table::new();
-                table.add_row(Row::new(vec![
-                    Cell::new("NAME"),
-                    Cell::new("VALUE"),
-                    Cell::new("TYPE"),
-                    Cell::new("TIMESTAMP"),
-                ]));
-
-                for entry in entries {
-                    table.add_row(Row::new(vec![
-                        Cell::new(&entry.name),
-                        Cell::new(&entry.value),
-                        Cell::new(&entry.kind),
-                        Cell::new(&entry.timestamp),
-                    ]));
-                }
-
-                table.printstd();
+                print_as_table(entries);
             }
             _ => unreachable!(),
         },
@@ -116,6 +100,27 @@ fn main() {
             println!("{:#?}", e)
         }
     }
+}
+
+fn print_as_table(entries: Vec<Entry>) {
+    let mut table = Table::new();
+    table.add_row(Row::new(vec![
+        Cell::new("NAME"),
+        Cell::new("VALUE"),
+        Cell::new("TYPE"),
+        Cell::new("TIMESTAMP"),
+    ]));
+
+    for entry in entries {
+        table.add_row(Row::new(vec![
+            Cell::new(&entry.name),
+            Cell::new(&entry.value),
+            Cell::new(&entry.kind),
+            Cell::new(&entry.timestamp),
+        ]));
+    }
+
+    table.printstd();
 }
 
 fn read_csv(path: &str) -> Vec<std::string::String> {
