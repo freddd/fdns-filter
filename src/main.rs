@@ -90,7 +90,7 @@ fn main() {
 
     match result {
         Ok(entries) => match matches.value_of("output").unwrap() {
-            "json" => println!("{:#?}", serde_json::to_string(&entries).unwrap()),
+            "json" => println!("{}", serde_json::to_string(&entries).unwrap()),
             "table" => {
                 print_as_table(entries);
             }
